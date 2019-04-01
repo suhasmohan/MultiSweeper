@@ -42,7 +42,7 @@ cff3e614f39f        multisweeper/server:latest   "java -jar /usr/loca…"   54 s
 93becc3bbdf7        multisweeper/server:latest   "java -jar /usr/loca…"   54 seconds ago      Up 52 seconds                           multisweeper_server.3.n5o4lbzekbcifihusxfepok8n
 ```
 
-###  SSH into a runninf container
+###  SSH into a running container
 Get the Container ID of the container you wish to SSH into by running ```docker container ls```
 ```sh
 $ docker exec -it <container ID> bash
