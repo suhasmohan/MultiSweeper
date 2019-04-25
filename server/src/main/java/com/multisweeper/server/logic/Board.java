@@ -1,3 +1,4 @@
+package com.multisweeper.server.logic;
 import java.util.Random;
 
 /**
@@ -139,7 +140,7 @@ public class Board {
    *
    * @return "play", "win", or "lose"
    */
-  public String getStatus() {
+  String getStatus() {
     return status.toString();
   }
 
@@ -192,6 +193,22 @@ public class Board {
     }
   }
 
+  public int getKeys(int r, int c) {
+    if (validIndex(r, c)) {
+      return keys[r][c];
+    } else {
+      throw new IllegalArgumentException("Invalid coordinate");
+    }
+  }
+
+  public int getSingleKeys(int r, int c) {
+    if (validIndex(r, c)) {
+      return r * nCols + c;
+    } else {
+      throw new IllegalArgumentException("Invalid coordinate");
+    }
+  }
+
   /**
    * mark tile - open tile, close tile, <br>
    * flag tile as mine<br>
@@ -230,7 +247,7 @@ public class Board {
     }
   }
 
-  public void tileFlag(int r, int c) {
+  void tileFlag(int r, int c) {
     if (validIndex(r, c)) {
       if (status == Status.PLAY) {
         Tile current_t = tiles[r][c];

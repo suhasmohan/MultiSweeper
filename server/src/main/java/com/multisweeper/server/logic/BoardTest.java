@@ -1,3 +1,4 @@
+package com.multisweeper.server.logic;
 import java.util.Random;
 
 public class BoardTest {
