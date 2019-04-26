@@ -6,10 +6,11 @@ services:
             - "8080:8080"
         volumes:
             - "/var/run/docker.sock:/var/run/docker.sock"
+            - "./docker-compose.yml:/usr/local/docker-compose.yml"
         deploy:
             replicas: 3
             update_config:
-                parallelism: 2
+                parallelism: 3
                 delay: 10s
             restart_policy:
                condition: none 
