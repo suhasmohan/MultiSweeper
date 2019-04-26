@@ -27,4 +27,8 @@ public class Click {
 		this.col = col;
 		this.type = type;
 	}
+
+	public String getType() {
+		return type;
+	}
 }

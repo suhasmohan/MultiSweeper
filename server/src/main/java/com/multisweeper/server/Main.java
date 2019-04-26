@@ -30,12 +30,15 @@ public class Main {
 
 		before((request, response) -> {
 			log.info(requestInfoToString(request));
+			response.header("Connection", "close");
 		});
 
 		RESTHandler restHandler = new RESTHandler();
 		get("/hello", (req, res) -> "Hello World from " + System.getenv("HOSTNAME") );
 
 		post("/api/click",  (req, res) -> restHandler.handleClick(req, res));
+
+		get("/api/board", (req,res) -> restHandler.getBoard(req, res));
 
 		System.out.println("Server started on port " + port);
 	}
