@@ -1,4 +1,6 @@
 package com.multisweeper.server.logic;
+
+import java.io.*;
 import java.util.Random;
 
 /**
@@ -11,23 +13,19 @@ import java.util.Random;
  *
  * <p>Board.java
  */
-public class Board {
+public class Board implements Serializable {
 
+  private static final long serialVersionUID = -2188786541491928301L;
   private final int nMines;
   private final int nRows;
   private final int nCols;
   private final int allCells;
-  private final int EMPTY_CELL = 0;
-  private final int MINE_CELL = 9;
   /**
    * tile values 0 - open, 1 - closed,<br>
    * 2 - question, 3 - mine
    */
-  private Tile[][] tiles;
-  /** mine and clue values, 9 - mine, 0-8 clue values */
-  private int[][] mines;
+  private Cell[][] cells;
 
-  private int[][] keys;
   /** Level 2 - game status win, lose, play */
   private Status status;
   /**
@@ -61,6 +59,28 @@ public class Board {
     nMines = (int) (nRows * nCols * rate);
     allCells = nRows * nCols;
     initGame();
+  }
+
+  static Board fromFile() {
+    try {
+      FileInputStream fi = new FileInputStream(new File("board.txt"));
+      ObjectInputStream oi = new ObjectInputStream(fi);
+
+      // Read objects
+      Board board = (Board) oi.readObject();
+
+      oi.close();
+      fi.close();
+      return board;
+
+    } catch (FileNotFoundException e) {
+      System.out.println("File not found");
+    } catch (IOException e) {
+      System.out.println("Error initializing stream");
+    } catch (ClassNotFoundException e) {
+      e.printStackTrace();
+    }
+    return null;
   }
 
   /**
@@ -112,10 +132,10 @@ public class Board {
    * @return char representing game board at r,c
    */
   private char getBoard(int r, int c) {
-    Tile tile = tiles[r][c];
-    int mine = mines[r][c];
+    Cell cell = cells[r][c];
+    Tile tile = cell.getTile();
     if (tile == Tile.CLOSED) {
-      if (status == Status.LOSE && mine == MINE_CELL) {
+      if (status == Status.LOSE && cell.isMine()) {
         return '*';
       } else {
         return '_';
@@ -123,12 +143,12 @@ public class Board {
     } else if (tile == Tile.FLAG) {
       return 'F';
     } else if (tile == Tile.OPEN) {
-      if (mine == EMPTY_CELL) {
+      if (cell.isEmpty()) {
         return ' ';
-      } else if (mine == MINE_CELL) {
+      } else if (cell.isMine()) {
         return '@';
-      } else if (mine > EMPTY_CELL && mine < MINE_CELL) {
-        return (char) ('0' + mine);
+      } else if (!cell.isMine() && !cell.isEmpty()) {
+        return (char) ('0' + cell.getCount());
       }
     }
 
@@ -172,7 +192,7 @@ public class Board {
    */
   public int getMines(int r, int c) {
     if (validIndex(r, c)) {
-      return mines[r][c];
+      return cells[r][c].getCount();
     } else {
       throw new IllegalArgumentException("Invalid coordinate");
     }
@@ -187,7 +207,7 @@ public class Board {
    */
   public Tile getTiles(int r, int c) {
     if (validIndex(r, c)) {
-      return tiles[r][c];
+      return cells[r][c].getTile();
     } else {
       throw new IllegalArgumentException("Invalid coordinate");
     }
@@ -195,7 +215,7 @@ public class Board {
 
   public int getKeys(int r, int c) {
     if (validIndex(r, c)) {
-      return keys[r][c];
+      return cells[r][c].getKey();
     } else {
       throw new IllegalArgumentException("Invalid coordinate");
     }
@@ -229,17 +249,16 @@ public class Board {
   void tileOpen(int r, int c) {
     if (validIndex(r, c)) {
       if (status == Status.PLAY) {
-        Tile current_t = tiles[r][c];
+        Tile current_t = cells[r][c].getTile();
         if (current_t == Tile.CLOSED) {
-          tiles[r][c] = Tile.OPEN;
-          int mine = mines[r][c];
-          if (mine == EMPTY_CELL) {
+          cells[r][c].setTile(Tile.OPEN);
+          if (cells[r][c].isEmpty()) {
             for (int dr = -1; dr <= 1; dr++) {
               for (int dc = -1; dc <= 1; dc++) {
                 tileOpen(r + dr, c + dc);
               }
             }
-          } else if (mine == MINE_CELL) {
+          } else if (cells[r][c].isMine()) {
             status = Status.LOSE;
           }
         }
@@ -250,11 +269,11 @@ public class Board {
   void tileFlag(int r, int c) {
     if (validIndex(r, c)) {
       if (status == Status.PLAY) {
-        Tile current_t = tiles[r][c];
+        Tile current_t = cells[r][c].getTile();
         if (current_t == Tile.CLOSED) {
-          tiles[r][c] = Tile.FLAG;
+          cells[r][c].setTile(Tile.FLAG);
         } else if (current_t == Tile.FLAG) {
-          tiles[r][c] = Tile.CLOSED;
+          cells[r][c].setTile(Tile.CLOSED);
         }
       }
     }
@@ -271,7 +290,7 @@ public class Board {
 
     for (int r = 0; r < nRows; r++) {
       for (int c = 0; c < nCols; c++) {
-        sb.append(mines[r][c]);
+        sb.append(cells[r][c].getCount());
       }
 
       sb.append("\n");
@@ -291,7 +310,7 @@ public class Board {
 
     for (int r = 0; r < nRows; r++) {
       for (int c = 0; c < nCols; c++) {
-        sb.append(String.format("%03d, ", keys[r][c]));
+        sb.append(String.format("%03d, ", cells[r][c].getKey()));
       }
 
       sb.append("\n");
@@ -311,7 +330,7 @@ public class Board {
 
     for (int r = 0; r < nRows; r++) {
       for (int c = 0; c < nCols; c++) {
-        sb.append(tiles[r][c].toString().charAt(0));
+        sb.append(cells[r][c].getTile().toString().charAt(0));
       }
 
       sb.append("\n");
@@ -345,15 +364,12 @@ public class Board {
   private void initGame() {
     // allocate space for mines and tiles array
     status = Status.WAIT;
-    mines = new int[nRows][nCols];
-    tiles = new Tile[nRows][nCols];
-    keys = new int[nRows][nCols];
-
-    // init tiles array
-    resetTiles();
+    cells = new Cell[nRows][nCols];
 
     // place mines
     placeMines();
+    // init tiles array
+    resetTiles();
 
     // update clues
     // calculateClues();
@@ -367,7 +383,7 @@ public class Board {
   private void resetTiles() {
     for (int r = 0; r < nRows; r++) {
       for (int c = 0; c < nCols; c++) {
-        tiles[r][c] = Tile.CLOSED;
+        cells[r][c].setTile(Tile.CLOSED);
       }
     }
   }
@@ -384,7 +400,7 @@ public class Board {
     int minesLeft = nMines;
     for (int r = 0; r < nRows; r++) {
       for (int c = 0; c < nCols; c++) {
-        mines[r][c] = EMPTY_CELL;
+        cells[r][c] = new Cell();
       }
     }
 
@@ -393,8 +409,8 @@ public class Board {
       int position = random.nextInt(allCells);
       int r = position / nCols;
       int c = position % nCols;
-      if ((mines[r][c] != MINE_CELL)) {
-        mines[r][c] = MINE_CELL;
+      if (!cells[r][c].isMine()) {
+        cells[r][c].setMine();
         i++;
         for (int rn = r - 1; rn <= r + 1; rn++) {
           for (int cn = c - 1; cn <= c + 1; cn++) {
@@ -410,18 +426,10 @@ public class Board {
    * integer value 9 represents a mine<br>
    * clue values will be 0 ... 8<br>
    */
-  private void calculateClues() {
-    //		add your code here
-  }
-  /**
-   * calculates clue values and updates clue values in mines array<br>
-   * integer value 9 represents a mine<br>
-   * clue values will be 0 ... 8<br>
-   */
   private void calculateClue(int r, int c) {
     if (r >= 0 && r < nRows && c >= 0 && c < nCols) {
-      if (mines[r][c] != MINE_CELL) {
-        mines[r][c]++;
+      if (!cells[r][c].isMine()) {
+        cells[r][c].addCount();
       }
     }
   }
@@ -429,7 +437,7 @@ public class Board {
   private void placeKeys() {
     for (int r = 0; r < nRows; r++) {
       for (int c = 0; c < nCols; c++) {
-        keys[r][c] = allCells;
+        cells[r][c].setKey(allCells);
       }
     }
     for (int r = 0; r < nRows; r++) {
@@ -440,10 +448,10 @@ public class Board {
   }
 
   private void spreadKey(int r, int c, int key, boolean empty) {
-    if (validIndex(r, c) && keys[r][c] > key) {
-      boolean empty_cur = mines[r][c] == EMPTY_CELL;
-      if (empty || mines[r][c] == EMPTY_CELL) {
-        keys[r][c] = key;
+    if (validIndex(r, c) && cells[r][c].getKey() > key) {
+      boolean empty_cur = cells[r][c].isEmpty();
+      if (empty || empty_cur) {
+        cells[r][c].setKey(key);
         for (int rn = r - 1; rn <= r + 1; rn++) {
           for (int cn = c - 1; cn <= c + 1; cn++) {
             spreadKey(rn, cn, key, empty_cur);
@@ -451,41 +459,5 @@ public class Board {
         }
       }
     }
-  }
-
-  private void checkEmptyKey(int r, int c) {
-    if (validIndex(r, c)) {
-      if (mines[r][c] == EMPTY_CELL) {
-
-        int minKey = allCells;
-        for (int rn = r - 1; rn <= r + 1; rn++) {
-          for (int cn = c - 1; cn <= c + 1; cn++) {
-            if (validIndex(rn, cn)) {
-              minKey = Math.min(minKey, keys[rn][cn]);
-            }
-          }
-        }
-        for (int rn = r - 1; rn <= r + 1; rn++) {
-          for (int cn = c - 1; cn <= c + 1; cn++) {
-            if (validIndex(rn, cn)) {
-              keys[rn][cn] = minKey;
-            }
-          }
-        }
-      }
-    }
-  }
-
-  private enum Status {
-    LOSE,
-    PLAY,
-    WAIT,
-    WIN
-  }
-
-  private enum Tile {
-    CLOSED,
-    FLAG,
-    OPEN
   }
 }

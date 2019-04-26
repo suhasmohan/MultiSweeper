@@ -1,8 +1,11 @@
 package com.multisweeper.server.logic;
+
 import java.util.Random;
 
 public class BoardTest {
   public static void main(String[] args) {
+    Board b = Board.fromFile();
+    System.out.println("DONE" + b.toStringBoard());
     Board board = new Board();
     int nRows = board.getRows();
     int nCols = board.getCols();
