@@ -1,4 +1,5 @@
 package com.multisweeper.server;
+import com.multisweeper.server.REST.RESTHandler;
 import com.multisweeper.server.utils.Constants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,9 +30,15 @@ public class Main {
 
 		before((request, response) -> {
 			log.info(requestInfoToString(request));
+			response.header("Connection", "close");
 		});
 
+		RESTHandler restHandler = new RESTHandler();
 		get("/hello", (req, res) -> "Hello World from " + System.getenv("HOSTNAME") );
+
+		post("/api/click",  (req, res) -> restHandler.handleClick(req, res));
+
+		get("/api/board", (req,res) -> restHandler.getBoard(req, res));
 
 		System.out.println("Server started on port " + port);
 	}
