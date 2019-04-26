@@ -1,5 +1,9 @@
 package com.multisweeper.server.logic;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.annotations.Expose;
+
 import java.io.*;
 import java.util.Random;
 
@@ -16,18 +20,20 @@ import java.util.Random;
 public class Board implements Serializable {
 
   private static final long serialVersionUID = -2188786541491928301L;
-  private final int nMines;
-  private final int nRows;
-  private final int nCols;
+  @Expose private final int nMines;
+  @Expose private final int nRows;
+  @Expose private final int nCols;
   private final int allCells;
+  private int nOpen;
+  @Expose private int bomb;
   /**
    * tile values 0 - open, 1 - closed,<br>
    * 2 - question, 3 - mine
    */
-  private Cell[][] cells;
+  @Expose private Cell[][] cells;
 
   /** Level 2 - game status win, lose, play */
-  private Status status;
+  @Expose private Status status;
   /**
    * default constructor<br>
    * board size 10 x 10<br>
@@ -57,7 +63,9 @@ public class Board implements Serializable {
     this.nRows = nRows;
     this.nCols = nCols;
     nMines = (int) (nRows * nCols * rate);
+    bomb = nMines;
     allCells = nRows * nCols;
+    nOpen = 0;
     initGame();
   }
 
@@ -252,17 +260,27 @@ public class Board implements Serializable {
         Tile current_t = cells[r][c].getTile();
         if (current_t == Tile.CLOSED) {
           cells[r][c].setTile(Tile.OPEN);
-          if (cells[r][c].isEmpty()) {
-            for (int dr = -1; dr <= 1; dr++) {
-              for (int dc = -1; dc <= 1; dc++) {
-                tileOpen(r + dr, c + dc);
+          nOpen++;
+          if (cells[r][c].isMine()) {
+            status = Status.LOSE;
+          } else {
+            if (cells[r][c].isEmpty()) {
+              for (int dr = -1; dr <= 1; dr++) {
+                for (int dc = -1; dc <= 1; dc++) {
+                  tileOpen(r + dr, c + dc);
+                }
               }
             }
-          } else if (cells[r][c].isMine()) {
-            status = Status.LOSE;
+            checkWin();
           }
         }
       }
+    }
+  }
+
+  private void checkWin() {
+    if (nOpen == allCells - nMines) {
+      status = Status.WIN;
     }
   }
 
@@ -272,8 +290,10 @@ public class Board implements Serializable {
         Tile current_t = cells[r][c].getTile();
         if (current_t == Tile.CLOSED) {
           cells[r][c].setTile(Tile.FLAG);
+          bomb--;
         } else if (current_t == Tile.FLAG) {
           cells[r][c].setTile(Tile.CLOSED);
+          bomb++;
         }
       }
     }
@@ -459,5 +479,11 @@ public class Board implements Serializable {
         }
       }
     }
+  }
+
+  String toJson() {
+    Gson gson =
+        new GsonBuilder().excludeFieldsWithoutExposeAnnotation().setPrettyPrinting().create();
+    return gson.toJson(this);
   }
 }

@@ -4,9 +4,8 @@ import java.util.Random;
 
 public class BoardTest {
   public static void main(String[] args) {
-    Board b = Board.fromFile();
-    System.out.println("DONE" + b.toStringBoard());
-    Board board = new Board();
+    InitBoardFile.main(new String[1]);
+    Board board = Board.fromFile();
     int nRows = board.getRows();
     int nCols = board.getCols();
     System.out.println(board.getCols());
@@ -25,6 +24,7 @@ public class BoardTest {
     BoardTest.printBoard(board, nRows, nCols);
     BoardTest.printBoard(board, nRows, nCols);
     BoardTest.printBoard(board, nRows, nCols);
+    System.out.println(board.toJson());
   }
 
   private static void printBoard(Board board, int nRows, int nCols) {

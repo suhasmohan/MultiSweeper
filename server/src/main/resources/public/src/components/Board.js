@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import Row from "./Row";
 import "../styles/Board.css";
+import PropTypes from "prop-types";
 
 export default class Board extends Component {
   renderRows() {
@@ -14,7 +15,7 @@ export default class Board extends Component {
           cellSize={this.props.cellSize}
           onClick={this.props.onClick}
           onRightClick={this.props.onRightClick}
-          onDoubleClick={this.props.onDoubleClick}
+          // onDoubleClick={this.props.onDoubleClick}
         />
       );
     });
@@ -29,3 +30,13 @@ export default class Board extends Component {
     );
   }
 }
+
+
+Board.propTypes = {
+  board: PropTypes.any,
+  onClick: PropTypes.func,
+  onRightClick: PropTypes.func,
+  cell: PropTypes.object,
+  cellSize: PropTypes.number
+};
+

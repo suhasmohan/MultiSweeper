@@ -10,8 +10,8 @@ import config from "../config";
 const initialState = {
   gameover: false,
   clear: false,
-  bomb: config["easy"].bombNum,
-  difficulty: "easy"
+  bomb: config["normal"].bombNum,
+  difficulty: "normal"
 };
 
 const game = (state = initialState, action) => {

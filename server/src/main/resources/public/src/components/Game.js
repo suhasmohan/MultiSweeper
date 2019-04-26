@@ -3,8 +3,9 @@ import { connect } from "react-redux";
 import Bomb from "react-icons/lib/fa/certificate";
 import Board from "./Board";
 import config from "../config";
-import { toggle, init, changeDifficulty, gameover, clear } from "../actions";
+import { toggle, init, /*changeDifficulty,*/ gameover, clear } from "../actions";
 import "../styles/Game.css";
+import PropTypes from "prop-types";
 
 class Game extends Component {
   constructor(props) {
@@ -14,7 +15,7 @@ class Game extends Component {
     this.handleClick = this.handleClick.bind(this);
     this.handleClickCell = this.handleClickCell.bind(this);
     this.handleRightClickCell = this.handleRightClickCell.bind(this);
-    this.handleDoubleClickCell = this.handleDoubleClickCell.bind(this);
+    // this.handleDoubleClickCell = this.handleDoubleClickCell.bind(this);
   }
 
   _initBoard(difficulty) {
@@ -63,6 +64,7 @@ class Game extends Component {
     if (gameover || clear) {
       return;
     }
+    // TODO Call API: {Click: open}
     this._open(x, y);
   }
 
@@ -71,38 +73,39 @@ class Game extends Component {
     if (gameover || clear) {
       return;
     }
+    // TODO Call API: {Click: flag}
     this._toggleFlag(x, y);
   }
 
-  handleDoubleClickCell(x, y) {
-    const { gameover, clear, difficulty } = this.props;
-    const { boardWidth, boardHeight } = config[difficulty];
-    const { board } = this.state;
-    if (gameover || clear) {
-      return;
-    }
-    if (!board[x][y].open) {
-      return;
-    }
+  // handleDoubleClickCell(x, y) {
+  //   const { gameover, clear, difficulty } = this.props;
+  //   const { boardWidth, boardHeight } = config[difficulty];
+  //   const { board } = this.state;
+  //   if (gameover || clear) {
+  //     return;
+  //   }
+  //   if (!board[x][y].open) {
+  //     return;
+  //   }
 
-    for (let i = x - 1; i <= x + 1; i++) {
-      for (let j = y - 1; j <= y + 1; j++) {
-        if ((i < 0 || i >= boardWidth) ||
-            (j < 0 || j >= boardHeight) ||
-            (i === x && j === y) ||
-            (board[i][j].flagged)) {
-          continue;
-        }
-        this._open(i, j);
-      }
-    }
-  }
+  //   for (let i = x - 1; i <= x + 1; i++) {
+  //     for (let j = y - 1; j <= y + 1; j++) {
+  //       if ((i < 0 || i >= boardWidth) ||
+  //           (j < 0 || j >= boardHeight) ||
+  //           (i === x && j === y) ||
+  //           (board[i][j].flagged)) {
+  //         continue;
+  //       }
+  //       this._open(i, j);
+  //     }
+  //   }
+  // }
 
-  changeDifficulty(e) {
-    const difficulty = e.target.value;
-    this.props.dispatch(changeDifficulty(difficulty));
-    this.setState({ board: this._initBoard(difficulty) });
-  }
+  // changeDifficulty(e) {
+  //   const difficulty = e.target.value;
+  //   this.props.dispatch(changeDifficulty(difficulty));
+  //   this.setState({ board: this._initBoard(difficulty) });
+  // }
 
   _open(x, y) {
     const board = [].concat(this.state.board);
@@ -187,13 +190,13 @@ class Game extends Component {
         <h1>Minesweeper</h1>
         <div id="menu">
           <button onClick={this.handleClick} id="restart">Restart</button>
-          <select value={difficulty} onChange={(e) => this.changeDifficulty(e)} style={{ marginRight: 5 }}>
+          {/*<select value={difficulty} onChange={(e) => this.changeDifficulty(e)} style={{ marginRight: 5 }}>
             <option value={"easy"} key={"easy"}>Easy</option>
             <option value={"normal"} key={"normal"}>Normal</option>
             <option value={"hard"} key={"hard"}>Hard</option>
             <option value={"veryHard"} key={"veryHard"}>Very Hard</option>
             <option value={"maniac"} key={"maniac"}>Maniac</option>
-          </select>
+          </select>*/}
           <span id="bomb"><Bomb style={{ marginTop: -3 }} /> {bomb}</span>
           {status}
         </div>
@@ -226,5 +229,14 @@ class Game extends Component {
 }
 
 const mapStateToProps = (state) => state.game;
+
+Game.propTypes = {
+  x: PropTypes.number,
+  y: PropTypes.number,
+  onClick: PropTypes.func,
+  onRightClick: PropTypes.func,
+  cell: PropTypes.object,
+  cellSize: PropTypes.number
+};
 
 export default connect(mapStateToProps)(Game);

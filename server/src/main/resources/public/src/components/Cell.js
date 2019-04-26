@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import Flag from "react-icons/lib/fa/flag";
 import Bomb from "react-icons/lib/fa/certificate";
 import "../styles/Cell.css";
+import PropTypes from "prop-types";
 
 const baseStyle = {
   width: 32,
@@ -22,7 +23,7 @@ export default class Cell extends Component {
   constructor(props) {
     super(props);
     this._handleClick = this._handleClick.bind(this);
-    this._handleDoubleClick = this._handleDoubleClick.bind(this);
+    // this._handleDoubleClick = this._handleDoubleClick.bind(this);
     this._handleRightClick = this._handleRightClick.bind(this);
   }
 
@@ -31,10 +32,10 @@ export default class Cell extends Component {
     this.props.onClick(this.props.x, this.props.y);
   }
 
-  _handleDoubleClick(e) {
-    e.preventDefault();
-    this.props.onDoubleClick(this.props.x, this.props.y);
-  }
+  // _handleDoubleClick(e) {
+  //   e.preventDefault();
+  //   this.props.onDoubleClick(this.props.x, this.props.y);
+  // }
 
   _handleRightClick(e) {
     e.preventDefault();
@@ -98,7 +99,7 @@ export default class Cell extends Component {
         className="cell"
         style={style}
         onClick={this._handleClick}
-        onDoubleClick={this._handleDoubleClick}
+        // onDoubleClick={this._handleDoubleClick}
         onContextMenu={this._handleRightClick}
       >
         {content}
@@ -106,3 +107,12 @@ export default class Cell extends Component {
     );
   }
 }
+
+Cell.propTypes = {
+  x: PropTypes.number,
+  y: PropTypes.number,
+  onClick: PropTypes.func,
+  onRightClick: PropTypes.func,
+  cell: PropTypes.object,
+  cellSize: PropTypes.number
+};
