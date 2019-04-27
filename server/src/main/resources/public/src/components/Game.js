@@ -138,7 +138,7 @@ class Game extends Component {
             >
               David
             </a>
-            <br />
+            {", "}
             <a
               href="https://github.com/hoonskii"
               target="_blank"
@@ -146,7 +146,7 @@ class Game extends Component {
             >
               Hoon
             </a>
-            <br />
+            {", "}
             <a
               href="https://github.com/suhasmohan"
               target="_blank"
@@ -154,7 +154,7 @@ class Game extends Component {
             >
               Suhas
             </a>
-            <br />
+            {", and "}
             <a
               href="https://github.com/bhandarysushruth"
               target="_blank"
