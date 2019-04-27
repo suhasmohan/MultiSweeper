@@ -18,6 +18,10 @@ class Game extends Component {
     this.handleRightClickCell = this.handleRightClickCell.bind(this);
   }
 
+  componentWillUnmount() {
+    clearInterval(this.updateInterval);
+  }
+
   _updateBoard() {
     this.updateInterval = setInterval(() => {
       fetch("/api/getBoard", {
@@ -26,7 +30,7 @@ class Game extends Component {
         .then(res => res.json())
         .catch(err => console.error(err))
         .then(res => {
-          console.log(res);
+          // console.log(res);
           this.setState({
             status: res.status,
             nRows: res.nRows,
@@ -92,7 +96,7 @@ class Game extends Component {
     }
     return (
       <div id="game" style={{ width: boardWidthPx }}>
-        <h1>Minesweeper</h1>
+        <h1>Multiplayer Minesweeper</h1>
         <div id="menu">
           <button onClick={this.handleClick} id="restart">
             Restart
@@ -138,7 +142,7 @@ class Game extends Component {
             >
               David
             </a>
-            <br />
+            {", "}
             <a
               href="https://github.com/hoonskii"
               target="_blank"
@@ -146,7 +150,7 @@ class Game extends Component {
             >
               Hoon
             </a>
-            <br />
+            {", "}
             <a
               href="https://github.com/suhasmohan"
               target="_blank"
@@ -154,7 +158,7 @@ class Game extends Component {
             >
               Suhas
             </a>
-            <br />
+            {", and "}
             <a
               href="https://github.com/bhandarysushruth"
               target="_blank"

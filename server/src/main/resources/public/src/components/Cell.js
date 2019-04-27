@@ -38,7 +38,14 @@ export default class Cell extends Component {
   }
 
   render() {
-    let content = this.props.cell.tile === "FLAG" ? <Flag /> : "";
+    let content =
+      this.props.cell.tile === "FLAG" ? (
+        <div style={{ color: "red" }}>
+          <Flag />
+        </div>
+      ) : (
+        ""
+      );
     let style = Object.assign({}, baseStyle, {
       width: this.props.cellSize - 8,
       height: this.props.cellSize - 8,
@@ -57,32 +64,32 @@ export default class Cell extends Component {
         if (this.props.cell.bombCount > 0) {
           content = this.props.cell.bombCount;
           switch (content) {
-          case 1:
-            style = Object.assign({}, style, { color: "blue" });
-            break;
-          case 2:
-            style = Object.assign({}, style, { color: "green" });
-            break;
-          case 3:
-            style = Object.assign({}, style, { color: "red" });
-            break;
-          case 4:
-            style = Object.assign({}, style, { color: "navy" });
-            break;
-          case 5:
-            style = Object.assign({}, style, { color: "darkred" });
-            break;
-          case 6:
-            style = Object.assign({}, style, { color: "deepskyblue" });
-            break;
-          case 7:
-            style = Object.assign({}, style, { color: "navy" });
-            break;
-          case 8:
-            style = Object.assign({}, style, { color: "gray" });
-            break;
-          default:
-            break;
+            case 1:
+              style = Object.assign({}, style, { color: "blue" });
+              break;
+            case 2:
+              style = Object.assign({}, style, { color: "green" });
+              break;
+            case 3:
+              style = Object.assign({}, style, { color: "red" });
+              break;
+            case 4:
+              style = Object.assign({}, style, { color: "navy" });
+              break;
+            case 5:
+              style = Object.assign({}, style, { color: "darkred" });
+              break;
+            case 6:
+              style = Object.assign({}, style, { color: "deepskyblue" });
+              break;
+            case 7:
+              style = Object.assign({}, style, { color: "navy" });
+              break;
+            case 8:
+              style = Object.assign({}, style, { color: "gray" });
+              break;
+            default:
+              break;
           }
         } else {
           content = "";
