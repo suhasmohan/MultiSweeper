@@ -1,13 +1,8 @@
 package com.multisweeper.server;
 
 import com.multisweeper.server.REST.RESTHandler;
-
-import com.multisweeper.server.failure.MinesweeperGroupFailureDetector;
-import com.multisweeper.server.failure.MinesweeperGroupMulticast;
-
 import com.multisweeper.server.failure.MSServerFailureDetection;
 import com.multisweeper.server.failure.MinesweeperGroupFailureDetector;
-
 import com.multisweeper.server.logic.Board;
 import com.multisweeper.server.logic.CommitListener;
 import com.multisweeper.server.logic.InitBoardFile;
@@ -40,24 +35,19 @@ public class Main {
     int port = Constants.PORT;
     port(port);
 
-    // building the game board text file
-    InitBoardFile.main(new String[1]);
-    Main.gameBoard = Board.fromFile();
-
     //STARTING FAILURE DETECTOR
 
     ArrayList<String> temp = new ArrayList<>();
 
     MinesweeperGroupFailureDetector failure_detector_obj = null;
-    try {
-      failure_detector_obj = new MinesweeperGroupFailureDetector("change this",0,temp);
-    } catch (IOException e) {
-      e.printStackTrace();
-    }
+    failure_detector_obj = new MinesweeperGroupFailureDetector((long) 0);
+
     Thread failure_detector = new Thread(failure_detector_obj);
-    failure_detector.run();
+    failure_detector.run();    
 
-
+    // building the game board text file
+    InitBoardFile.main(new String[1]);
+    Main.gameBoard = Board.fromFile();
 
 
     //STARTING COMMIT LISTENER
