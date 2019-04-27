@@ -25,3 +25,8 @@ hs_err_pid*
 target/
 .idea/
 .DS_Store
+server/.classpath
+server/.project
+server/.settings/org.eclipse.jdt.core.prefs
+server/board.txt
+server/board.txt
