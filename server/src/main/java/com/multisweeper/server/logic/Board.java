@@ -498,4 +498,10 @@ public class Board implements Serializable {
         new GsonBuilder().excludeFieldsWithoutExposeAnnotation().setPrettyPrinting().create();
     return gson.toJson(this);
   }
+
+  public String toFullJson() {
+    Gson gson =
+            new GsonBuilder().setPrettyPrinting().create();
+    return gson.toJson(this);
+  }
 }

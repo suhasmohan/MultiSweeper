@@ -71,6 +71,7 @@ public class Main {
 		post("/api/click", (req, res) -> RESTHandler.handleClick(req, res));
 
 		get("/api/getBoard", (req, res) -> RESTHandler.getBoard(req, res));
+		get("/api/getFullBoard", (req, res) -> RESTHandler.getFullBoard(req, res));
 
 		System.out.println("Server started on port " + port);
 	}

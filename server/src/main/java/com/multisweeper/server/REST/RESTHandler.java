@@ -42,6 +42,12 @@ public class RESTHandler {
 		return RESTHandler.board.toJson();
 	}
 
+	public static Object getFullBoard(Request req, Response res) {
+		log.info("Getting board!");
+		// TODO - Get board and convert to JSON
+		return RESTHandler.board.toFullJson();
+	}
+
 	public static void setBoard(Board board) {
 		RESTHandler.board = board;
 	}

@@ -2,8 +2,8 @@ version: "3"
 services:
     server:
         image: multisweeper/server
-        ports:
-            - "8080:8080"
+        #ports:
+        #    - "8080:8080"
         networks:
             - broadcast-net
         volumes:
@@ -12,8 +12,23 @@ services:
             replicas: 3
             update_config:
                 parallelism: 2
-                delay: 10s
+                delay: 1s
             restart_policy:
-               condition: none 
+               condition: on-failure 
+    lb:
+        image: multisweeper/lb
+        ports:
+            - "8080:8080"
+        networks:
+            - broadcast-net
+        deploy:
+            replicas: 1
+            update_config:
+                parallelism: 2
+                delay: 1s
+            restart_policy:
+               condition: on-failure 
+               delay: 10s
+
 networks:
     broadcast-net:

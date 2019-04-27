@@ -30,7 +30,7 @@ public class ReplicationHandler {
 				// Make HTTP Request
 				URL url = null;
 				try {
-					url = new URL("http://"+ip+":8080/api/getBoard");
+					url = new URL("http://"+ip+":8080/api/getFullBoard");
 					HttpURLConnection con = (HttpURLConnection) url.openConnection();
 					con.setRequestMethod("GET");
 					int status = con.getResponseCode();
@@ -45,10 +45,11 @@ public class ReplicationHandler {
 					in.close();
 					con.disconnect();
 
-					Logger.log("Got replica!");
+					Logger.log("Got replica! " + content.toString());
 					Board replicatedBoard = new Gson().fromJson(content.toString(), Board.class);
-
+					Logger.log(replicatedBoard.toFullJson());
 					RESTHandler.setBoard(replicatedBoard);
+					return;
 
 				} catch (MalformedURLException e) {
 					e.printStackTrace();
