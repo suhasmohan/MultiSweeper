@@ -32,24 +32,19 @@ export default class Cell extends Component {
     this.props.onClick(this.props.x, this.props.y);
   }
 
-  // _handleDoubleClick(e) {
-  //   e.preventDefault();
-  //   this.props.onDoubleClick(this.props.x, this.props.y);
-  // }
-
   _handleRightClick(e) {
     e.preventDefault();
     this.props.onRightClick(this.props.x, this.props.y);
   }
 
   render() {
-    let content = this.props.cell.flagged ? <Flag /> : "";
+    let content = this.props.cell.tile === "FLAG" ? <Flag /> : "";
     let style = Object.assign({}, baseStyle, {
       width: this.props.cellSize - 8,
       height: this.props.cellSize - 8,
-      lineHeight: `${this.props.cellSize - 8}px`,
+      lineHeight: `${this.props.cellSize - 8}px`
     });
-    if (this.props.cell.open) {
+    if (this.props.cell.tile === "OPEN") {
       style = Object.assign({}, style, openStyle, {
         width: this.props.cellSize - 2,
         height: this.props.cellSize - 2,

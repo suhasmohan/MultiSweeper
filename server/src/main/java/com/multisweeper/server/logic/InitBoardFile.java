@@ -1,10 +1,13 @@
 package com.multisweeper.server.logic;
 
 import java.io.*;
+import java.util.Random;
 
 public class InitBoardFile {
   public static void main(String[] args) {
-    Board board = new Board();
+    Random rand = new Random();
+    int nRow = Math.min((int) (Math.abs(rand.nextGaussian() * 30) + 10), 70);
+    Board board = new Board(nRow);
     try {
 
       File file = new File("board.txt");

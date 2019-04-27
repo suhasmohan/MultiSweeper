@@ -2,33 +2,37 @@ package com.multisweeper.server.REST;
 
 public class Click {
 
-	int row;
-	int col;
-	String type;
+  private int row;
+  private int col;
+  private String type;
 
-	public int getRow() {
-		return row;
-	}
+  public Click(int row, int col, String type) {
+    this.row = row;
+    this.col = col;
+    this.type = type;
+  }
 
-	public int getCol() {
-		return col;
-	}
+  int getRow() {
+    return row;
+  }
 
-	public boolean isOpen() {
-		return type.equalsIgnoreCase("open");
-	}
+  int getCol() {
+    return col;
+  }
 
-	public boolean isFlag() {
-		return type.equalsIgnoreCase("flag");
-	}
+  public boolean isOpen() {
+    return type.equalsIgnoreCase("open");
+  }
 
-	public Click(int row, int col, String type) {
-		this.row = row;
-		this.col = col;
-		this.type = type;
-	}
+  public boolean isFlag() {
+    return type.equalsIgnoreCase("flag");
+  }
 
-	public String getType() {
-		return type;
-	}
+  public boolean isRestart() {
+    return type.equalsIgnoreCase("restart");
+  }
+
+  public String getType() {
+    return type;
+  }
 }

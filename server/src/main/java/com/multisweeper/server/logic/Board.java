@@ -20,7 +20,7 @@ import java.util.Random;
 public class Board implements Serializable {
 
   private static final long serialVersionUID = -2188786541491928301L;
-  @Expose private final int nMines;
+  private final int nMines;
   @Expose private final int nRows;
   @Expose private final int nCols;
   private final int allCells;
@@ -42,8 +42,19 @@ public class Board implements Serializable {
    * calculate clues<br>
    * (*)set game status to play<br>
    */
-  Board() {
+  public Board() {
     this(10, 10, 0.15);
+  }
+  /**
+   * default constructor<br>
+   * board size 10 x 10<br>
+   * create mines and tile arrays<br>
+   * place mines<br>
+   * calculate clues<br>
+   * (*)set game status to play<br>
+   */
+  public Board(int nRow) {
+    this(nRow, nRow >= 30 ? nRow / 2 : nRow, 0.15);
   }
   /**
    * alternate constructor use specifies board size<br>
@@ -69,7 +80,7 @@ public class Board implements Serializable {
     initGame();
   }
 
-  static Board fromFile() {
+  public static Board fromFile() {
     try {
       FileInputStream fi = new FileInputStream(new File("board.txt"));
       ObjectInputStream oi = new ObjectInputStream(fi);
@@ -254,14 +265,17 @@ public class Board implements Serializable {
    * @param r row index
    * @param c column index
    */
-  void tileOpen(int r, int c) {
+  public void tileOpen(int r, int c) {
+
     if (validIndex(r, c)) {
+      System.out.println(toStringBoard());
       if (status == Status.PLAY) {
         Tile current_t = cells[r][c].getTile();
         if (current_t == Tile.CLOSED) {
           cells[r][c].setTile(Tile.OPEN);
           nOpen++;
           if (cells[r][c].isMine()) {
+            System.out.println(toStringBoard());
             status = Status.LOSE;
           } else {
             if (cells[r][c].isEmpty()) {
@@ -284,7 +298,7 @@ public class Board implements Serializable {
     }
   }
 
-  void tileFlag(int r, int c) {
+  public void tileFlag(int r, int c) {
     if (validIndex(r, c)) {
       if (status == Status.PLAY) {
         Tile current_t = cells[r][c].getTile();
@@ -481,7 +495,7 @@ public class Board implements Serializable {
     }
   }
 
-  String toJson() {
+  public String toJson() {
     Gson gson =
         new GsonBuilder().excludeFieldsWithoutExposeAnnotation().setPrettyPrinting().create();
     return gson.toJson(this);
