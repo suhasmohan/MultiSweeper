@@ -43,7 +43,7 @@ public class Main {
     failure_detector_obj = new MinesweeperGroupFailureDetector((long) 0);
 
     Thread failure_detector = new Thread(failure_detector_obj);
-    failure_detector.run();    
+    failure_detector.run();
 
     // building the game board text file
     InitBoardFile.main(new String[1]);

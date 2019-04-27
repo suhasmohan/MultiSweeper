@@ -11,8 +11,7 @@ import java.net.*;
 //class ServerClass implements ServerInterface{
 class ServerClass{	
 	int self_port;
-	String self_ip;
-	ArrayList<String> ips= new ArrayList<String>();
+	ArrayList<String> ips = new ArrayList<>();
 	ArrayList<Integer> ports= new ArrayList<Integer>();
 
 	ServerClass(int port){
@@ -21,7 +20,7 @@ class ServerClass{
 
 
 	private void updateIpAddresses(){
-			MinesweeperGroupFailureDetector.getAliveMemberAddrs();
+			this.ips =new ArrayList<>(MinesweeperGroupFailureDetector.getAliveMemberAddrs());
 
 	}
 
