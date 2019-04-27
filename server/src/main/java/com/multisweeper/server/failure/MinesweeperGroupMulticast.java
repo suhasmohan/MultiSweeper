@@ -5,13 +5,14 @@ import java.net.InetAddress;
 import java.net.MulticastSocket;
 import java.util.LinkedList;
 import java.util.Queue;
+import java.util.Set;
 
 /**
 * MinesweeperGroupMulticast
 *
 * This class implements multicast functionality of the Minesweeper servers.
 * The messages are in FIFO ordering. The ordering is achieved through
-* basic multicast (threaded) and lamport process clock sequence piggybacked
+* reliable multicast (threaded) and lamport process clock sequence piggybacked
 * to each message to the group. The algorithm is written with an assumption 
 * that the group is a closed and non-overlapping. 
 *
@@ -29,6 +30,7 @@ public class MinesweeperGroupMulticast implements Runnable {
 	// message buffer
 	private static Queue<DatagramPacket> receivedPacketQueue;
 	private static Queue<DatagramPacket> sendPacketQueue;
+	private static Set<String> receivedMessages;
 	// mode switches
 	private boolean sendOp;
 	private boolean receiveOp;
@@ -198,13 +200,19 @@ public class MinesweeperGroupMulticast implements Runnable {
 										Integer.parseInt(parsedMessage[2]));
 						} else {
 							// create echo back message and put it in the send message queue
-							DatagramPacket echoBackPacket = 
-									new DatagramPacket(receivedPacket.getData(),
-											receivedPacket.getData().length,
-												receivedPacket.getAddress(),
-													receivedPacket.getPort());
-							synchronized(MinesweeperGroupMulticast.sendPacketQueue) {
-								MinesweeperGroupMulticast.sendPacketQueue.add(echoBackPacket);
+							String message = new String(receivedPacket.getData(),0,
+									receivedPacket.getLength());
+							if (!MinesweeperGroupMulticast.receivedMessages.contains(message)) {
+								DatagramPacket echoBackPacket = 
+										new DatagramPacket(receivedPacket.getData(),
+												receivedPacket.getData().length,
+													InetAddress.getByName(
+															MinesweeperGroupMulticast.myIPAddr),
+																receivedPacket.getPort());
+								synchronized(MinesweeperGroupMulticast.sendPacketQueue) {
+									MinesweeperGroupMulticast.sendPacketQueue.add(echoBackPacket);
+								}
+								MinesweeperGroupMulticast.receivedMessages.add(message);
 							}
 						}
 					}
