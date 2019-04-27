@@ -23,7 +23,7 @@ public interface MSServerFailureDetection extends Runnable {
 	   * members' IP addresses without this server's IP address
 	   * @return 
 	   */
-	public ArrayList<String> getGroupAddrsList();
+	//public ArrayList<String> getGroupAddrsList();
 
 	/**
 	   * getAliveMemberAddrs(): returns alive group members' ports.
