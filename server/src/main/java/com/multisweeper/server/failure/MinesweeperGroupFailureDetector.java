@@ -90,7 +90,7 @@ public class MinesweeperGroupFailureDetector implements MSServerFailureDetection
 				MinesweeperGroupFailureDetector.msgSeq);
 		// send to each group members
 		for (InetAddress broadcastIP : listAllBroadcastAddresses()) {
-			Logger.log("Sending msg to " + broadcastIP.getHostAddress());
+			//Logger.log("Sending msg to " + broadcastIP.getHostAddress());
 			DatagramPacket touchBaseMessage =
 					new DatagramPacket(messageToGroup.getBytes("UTF-8"),
 							messageToGroup.getBytes("UTF-8").length,
@@ -188,7 +188,7 @@ public class MinesweeperGroupFailureDetector implements MSServerFailureDetection
 				// wait 500ms for the group members to reply
 				Thread.sleep(TOUCH_BASE_MULTICAST_INTERVAL);
 				// update alive/dead lists
-				Logger.log("ALive servers = " + getAliveMemberAddrs().toString());
+				//Logger.log("ALive servers = " + getAliveMemberAddrs().toString());
 			} catch (Exception err) {
 				this.handleExceptions(err);
 			}

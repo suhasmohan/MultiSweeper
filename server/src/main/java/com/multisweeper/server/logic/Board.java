@@ -80,9 +80,9 @@ public class Board implements Serializable {
     initGame();
   }
 
-  public static Board fromFile() {
+  public static Board fromFile(String path) {
     try {
-      FileInputStream fi = new FileInputStream(new File("board.txt"));
+      FileInputStream fi = new FileInputStream(new File(path));
       ObjectInputStream oi = new ObjectInputStream(fi);
 
       // Read objects

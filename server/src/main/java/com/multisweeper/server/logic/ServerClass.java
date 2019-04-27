@@ -1,6 +1,7 @@
 package com.multisweeper.server.logic;
 
 import com.multisweeper.server.Main;
+import com.multisweeper.server.REST.RESTHandler;
 import com.multisweeper.server.failure.MinesweeperGroupFailureDetector;
 
 import java.util.*;
@@ -26,8 +27,8 @@ class ServerClass{
 
 	public void playerMove(String type, int row, int col){
 
-		int main_key = Main.gameBoard.getKeys(row,col);
-		int secondary_key = Main.gameBoard.getSingleKeys(row, col);
+		int main_key = RESTHandler.board.getKeys(row,col);
+		int secondary_key = RESTHandler.board.getSingleKeys(row, col);
 		String mess;
 		// starting 2 phase commit
 
@@ -94,10 +95,5 @@ class ServerClass{
 		}
 		//Logger.log("Got responses from all servers!");
 	}
-
-	public Board getBoardReplica(){
-		return Main.gameBoard;
-	}
-
 
 }

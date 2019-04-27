@@ -5,7 +5,7 @@ import java.util.Random;
 public class BoardTest {
   public static void main(String[] args) {
     InitBoardFile.main(new String[1]);
-    Board board = Board.fromFile();
+    Board board = Board.fromFile("");
     int nRows = board.getRows();
     int nCols = board.getCols();
     System.out.println(board.getCols());

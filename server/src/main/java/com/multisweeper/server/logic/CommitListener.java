@@ -1,5 +1,6 @@
 package com.multisweeper.server.logic;
 import com.multisweeper.server.Main;
+import com.multisweeper.server.REST.RESTHandler;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -90,8 +91,7 @@ public class CommitListener extends Thread {
 					// implement the put operation for a given key/tile
 					int row= Integer.parseInt(received_messages[1]);
 					int col = Integer.parseInt(received_messages[2]);
-					Main.gameBoard.tileOpen(row,col);
-
+					RESTHandler.board.tileOpen(row,col);
 				}
 
 				dos.writeUTF(response);
