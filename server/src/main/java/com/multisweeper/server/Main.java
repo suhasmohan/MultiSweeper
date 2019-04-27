@@ -1,38 +1,55 @@
 package com.multisweeper.server;
+
+import com.multisweeper.server.REST.RESTHandler;
+import com.multisweeper.server.logic.Board;
+import com.multisweeper.server.logic.InitBoardFile;
 import com.multisweeper.server.utils.Constants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import spark.Request;
 
 import static spark.Spark.*;
-import static spark.debug.DebugScreen.*;
+import static spark.debug.DebugScreen.enableDebugScreen;
 
 public class Main {
 
-	static Logger log = LoggerFactory.getLogger(Main.class);
+  public static Board gameBoard;
+  private static Logger log = LoggerFactory.getLogger(Main.class);
+  // initializing the gameBoard
 
-	private static String requestInfoToString(Request request) {
-		StringBuilder sb = new StringBuilder();
-		sb.append(request.requestMethod());
-		sb.append(" " + request.url());
-		sb.append(" " + request.body());
-		return sb.toString();
-	}
+  private static String requestInfoToString(Request request) {
+    StringBuilder sb = new StringBuilder();
+    sb.append(request.requestMethod());
+    sb.append(" " + request.url());
+    sb.append(" " + request.body());
+    return sb.toString();
+  }
 
-	public static void main(String[] args) {
-		int port = Constants.PORT;
-		port(port);
+  public static void main(String[] args) {
+    int port = Constants.PORT;
+    port(port);
 
-		staticFiles.location("/public");
-		staticFiles.expireTime(600L);
-		enableDebugScreen();
+    // building the game board text file
+    InitBoardFile.main(new String[1]);
+    Main.gameBoard = Board.fromFile();
 
-		before((request, response) -> {
-			log.info(requestInfoToString(request));
-		});
+    staticFiles.location("/public");
+    staticFiles.expireTime(600L);
+    enableDebugScreen();
 
-		get("/hello", (req, res) -> "Hello World from " + System.getenv("HOSTNAME") );
+    before(
+        (request, response) -> {
+          Main.log.info(Main.requestInfoToString(request));
+          response.header("Connection", "close");
+        });
 
-		System.out.println("Server started on port " + port);
-	}
+    RESTHandler restHandler = new RESTHandler();
+    get("/hello", (req, res) -> "Hello World from " + System.getenv("HOSTNAME"));
+
+    post("/api/click", (req, res) -> RESTHandler.handleClick(req, res));
+
+    get("/api/getBoard", (req, res) -> RESTHandler.getBoard(req, res));
+
+    System.out.println("Server started on port " + port);
+  }
 }
