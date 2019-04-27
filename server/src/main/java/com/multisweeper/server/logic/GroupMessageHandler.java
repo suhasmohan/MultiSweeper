@@ -1,9 +1,7 @@
 package com.multisweeper.server.logic;
 
-import java.io.BufferedReader;
+
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
@@ -13,12 +11,13 @@ import java.io.DataOutputStream;
 public class GroupMessageHandler extends Thread {
 
 	private static List<String> responses = new ArrayList<>();
-	int port;
+	int port=3005;
+	String my_ip;
 	String message;
 	//private static Object lock = new Object();
 
-	public GroupMessageHandler(int port, String message) {
-		this.port = port;
+	public GroupMessageHandler(String ip, String message) {
+		this.my_ip = ip;
 		this.message = message;
 	}
 

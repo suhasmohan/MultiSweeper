@@ -10,6 +10,7 @@ import java.net.*;
 //class ServerClass implements ServerInterface{
 class ServerClass{	
 	int self_port;
+	String self_ip;
 	ArrayList<String> ips= new ArrayList<String>(List.of("localhost","localhost","localhost"));
 	ArrayList<Integer> ports= new ArrayList<Integer>(List.of(3000,3001,3002));
 
@@ -28,6 +29,9 @@ class ServerClass{
 //
 //	}
 
+	public void updateIpAddresses(){
+
+	}
 
 	public void playerMove(String type, int row, int col){
 
@@ -84,8 +88,8 @@ class ServerClass{
 
 	private void multiCast(String message) throws InterruptedException {
 		List<Thread> threadList = new ArrayList<>();
-		for (int port : this.ports) {
-			Thread t = new GroupMessageHandler(port, message);
+		for (String ip : this.ips) {
+			Thread t = new GroupMessageHandler(ip, message);
 			threadList.add(t);
 			t.start();
 		}
