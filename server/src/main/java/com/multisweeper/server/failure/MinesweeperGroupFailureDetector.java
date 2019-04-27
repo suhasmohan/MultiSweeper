@@ -51,7 +51,6 @@ public class MinesweeperGroupFailureDetector implements MSServerFailureDetection
 	public MinesweeperGroupFailureDetector(Long msgSeq
 	) {
 		this.setStaticGroupLists();
-//		this.setlastReceivedSeqTable();
 		MinesweeperGroupMulticast.setMessageQueues();
 		MinesweeperGroupMulticast.setServerSocket(GROUP_COMM_PORT);
 
@@ -60,7 +59,6 @@ public class MinesweeperGroupFailureDetector implements MSServerFailureDetection
 	}
 
 	// Private methods
-
 	/**
 	 * setStaticGroupLists() method instantiates the static variable if
 	 * they are not initialized.
@@ -77,22 +75,6 @@ public class MinesweeperGroupFailureDetector implements MSServerFailureDetection
 		}
 	}
 
-//	/**
-//	   * setlastReceivedSeqTable() method creates and puts entries into
-//	   * lastReceivedSeqTable.
-//	   * @return nothing.
-//	   */
-//	private void setlastReceivedSeqTable() {
-//		MinesweeperGroupFailureDetector.lastReceivedSeqTable = new Hashtable<String, Long>();
-//		synchronized(MinesweeperGroupFailureDetector.lastReceivedSeqTable) {
-//			for (String ipAddr : MinesweeperGroupFailureDetector.groupAddrs) {
-//				MinesweeperGroupFailureDetector.lastReceivedSeqTable
-//					.put(ipAddr,MinesweeperGroupFailureDetector.msgSeq);
-//			}
-//		}
-//	}
-//
-
 	/**
 	 * addMessagesToQueue method periodic group multicast messages to send
 	 * message queue.
@@ -107,7 +89,6 @@ public class MinesweeperGroupFailureDetector implements MSServerFailureDetection
 				System.getenv("HOSTNAME"),
 				MinesweeperGroupFailureDetector.msgSeq);
 		// send to each group members
-		//for (String ipAddr : MinesweeperGroupFailureDetector.groupAddrs) {
 		for (InetAddress broadcastIP : listAllBroadcastAddresses()) {
 			//Logger.log("Sending msg to " + broadcastIP.getHostAddress());
 			DatagramPacket touchBaseMessage =
@@ -120,7 +101,13 @@ public class MinesweeperGroupFailureDetector implements MSServerFailureDetection
 		MinesweeperGroupFailureDetector.msgSeq++;
 	}
 
-	List<InetAddress> listAllBroadcastAddresses() {
+	/**
+	 * listAllBroadcastAddresses(): method get the list of IP addresses 
+	 * used in the broadcasting.
+	 *
+	 * @return list of IP addresses used for broadcasting in InetAddress form.
+	 */
+	private List<InetAddress> listAllBroadcastAddresses() {
 		List<InetAddress> broadcastList = new ArrayList<>();
 		try {
 			Enumeration<NetworkInterface> interfaces
@@ -201,8 +188,10 @@ public class MinesweeperGroupFailureDetector implements MSServerFailureDetection
 				// wait 500ms for the group members to reply
 				Thread.sleep(TOUCH_BASE_MULTICAST_INTERVAL);
 				// update alive/dead lists
+
 				//this.updateGroupStatusLists();
 				//Logger.log("ALive servers = " + getAliveMemberAddrs().toString());
+
 			} catch (Exception err) {
 				this.handleExceptions(err);
 			}
@@ -229,7 +218,6 @@ public class MinesweeperGroupFailureDetector implements MSServerFailureDetection
 	}
 
 	// public methods
-
 	/**
 	 * updatelastReceivedValue(): method is used to update the last seen
 	 * sequence number for each group member.
@@ -243,18 +231,6 @@ public class MinesweeperGroupFailureDetector implements MSServerFailureDetection
 	}
 
 	/**
-	 * getGroupAddrsList(): method gets the list of group
-	 * members' IP addresses without this server's IP address
-	 * @return
-	 */
-//	public static ArrayList<String> getGroupAddrsList() {
-//		return MinesweeperGroupFailureDetector.groupAddrs;
-//	}
-
-	// MinesweeperServerFailureDetection interface methods
-
-
-	/**
 	 * getAliveMemberAddrs(): returns alive group members' ports.
 	 *
 	 * @return a array of port numbers of alive group members
@@ -263,12 +239,15 @@ public class MinesweeperGroupFailureDetector implements MSServerFailureDetection
 		ArrayList<String> aliveMembers = new ArrayList<>();
 		long currentTimeStamp = ZonedDateTime.now().toInstant().toEpochMilli();
 		for (Map.Entry<String, Long> entry : lastReceivedSeqTable.entrySet()) {
-			if (entry.getValue() > currentTimeStamp - (TOUCH_BASE_MULTICAST_INTERVAL * MISSED_MESSAGE_TOLERANCE_COUNT)) {
+			if (entry.getValue() > currentTimeStamp - 
+				(TOUCH_BASE_MULTICAST_INTERVAL * MISSED_MESSAGE_TOLERANCE_COUNT)) {
 				aliveMembers.add(entry.getKey());
 			}
 		}
 		return aliveMembers;
 	}
+
+	// MinesweeperServerFailureDetection interface methods
 
 	/**
 	 * getDeadMemberAddrs(): returns dead group members' ports.

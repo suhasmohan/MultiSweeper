@@ -14,7 +14,7 @@ import java.util.Set;
  * <p>
  * This class implements multicast functionality of the Minesweeper servers.
  * The messages are in FIFO ordering. The ordering is achieved through
- * reliable multicast (threaded) and lamport process clock sequence piggybacked
+ * basic multicast (threaded) and lamport process clock sequence piggybacked
  * to each message to the group. The algorithm is written with an assumption
  * that the group is a closed and non-overlapping.
  *
@@ -59,16 +59,6 @@ public class MinesweeperGroupMulticast implements Runnable {
 		this.msgProcessOp = msgProcessOp;
 	}
 
-	public void broadcast(
-			DatagramPacket packet) throws IOException {
-		socket = new DatagramSocket();
-		socket.setBroadcast(true);
-
-
-		socket.send(packet);
-		socket.close();
-	}
-
 	/**
 	 * setServerSocket(): method sets up the server socket.
 	 *
@@ -81,9 +71,6 @@ public class MinesweeperGroupMulticast implements Runnable {
 		} catch (SocketException e) {
 			e.printStackTrace();
 		}
-//		for (String ipAddr : MinesweeperGroupFailureDetector.getGroupAddrsList()) {
-//			udpSocket.joinGroup(InetAddress.getByName(ipAddr));
-//		}
 		System.out.printf("Server is running at port: %d\n", portNum);
 	}
 
@@ -121,12 +108,27 @@ public class MinesweeperGroupMulticast implements Runnable {
 	}
 
 	/**
+	 * broadcast(): method broadcasts a datagram packet
+	 * to the subnet.
+	 *
+	 * @param packet datagram packet to send
+	 * @return nothing
+	 */
+	public void broadcast(
+			DatagramPacket packet) throws IOException {
+		socket = new DatagramSocket();
+		socket.setBroadcast(true);
+		socket.send(packet);
+		socket.close();
+	}
+
+	/**
 	 * parseMessageToArray(): method parses received message
 	 * into a string array.
 	 * index ->
-	 * 0: message origin IP Address
+	 * 0: hearbeat message
 	 * 1: message origin Docker container ID
-	 * 2:
+	 * 2: message sequence
 	 *
 	 * @return a string array of parsed message values
 	 */
@@ -155,7 +157,7 @@ public class MinesweeperGroupMulticast implements Runnable {
 
 	/**
 	 * sendMessages(): multicasts messages to group members.
-	 * Message format: "<IP-address>|<Container-ID>|<sequence-number>"
+	 * Message format: "<message>|<container-id>|<sequence-number>"
 	 *
 	 * @return nothing
 	 */
@@ -170,7 +172,6 @@ public class MinesweeperGroupMulticast implements Runnable {
 						//MinesweeperGroupMulticast.udpSocket.send(sendPacket);
 						//Logger.log("Sending broadcast message!");
 						broadcast(sendPacket);
-
 					}
 				}
 
@@ -182,7 +183,7 @@ public class MinesweeperGroupMulticast implements Runnable {
 
 	/**
 	 * receiveMessages(): receive messages from group members.
-	 * Message format: "<IP-address>|<Container-ID>|<sequence-number>"
+	 * Message format: "<message>|<container-id>|<sequence-number>"
 	 *
 	 * @return nothing
 	 */
@@ -207,7 +208,7 @@ public class MinesweeperGroupMulticast implements Runnable {
 	/**
 	 * processMessages(): process messages by parsing and comparing liveness sequence
 	 * number in each message.
-	 * Message format: "<IP-address>|<Container-ID>|<sequence-number>"
+	 * Message format: "<message>|<container-id>|<sequence-number>"
 	 *
 	 * @return nothing
 	 */
@@ -222,14 +223,11 @@ public class MinesweeperGroupMulticast implements Runnable {
 						// parse the message into String array (always length of 3)
 						// [<IP-address>,<Container-ID>,<sequence-number>]
 						String[] parsedMessage = this.parseMessageToArray(receivedPacket);
-						// if this is a echoed back message from a group member
-
 						// update the entry with the sender's IP address as key in the
 						// last seen sequence tracking table
 						MinesweeperGroupFailureDetector.updatelastReceivedValue(
 								receivedPacket.getAddress().getHostAddress(),
 								ZonedDateTime.now().toInstant().toEpochMilli());
-
 					}
 				}
 			} catch (Exception err) {

@@ -10,7 +10,7 @@ public class InitBoardFile {
     Board board = new Board(nRow);
     try {
 
-      File file = new File("board.txt");
+      File file = new File(args[0]);
       file.createNewFile();
 
       FileOutputStream f = new FileOutputStream(file);

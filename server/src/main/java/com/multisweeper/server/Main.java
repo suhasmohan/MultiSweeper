@@ -32,27 +32,19 @@ public class Main {
   }
 
   public static void main(String[] args) {
+	  if (args.length == 1) {
+		  InitBoardFile.main(args);
+		  return;
+	  }
     int port = Constants.PORT;
     port(port);
-
-    //STARTING FAILURE DETECTOR
-
-    ArrayList<String> temp = new ArrayList<>();
-
-    MinesweeperGroupFailureDetector failure_detector_obj = null;
-    failure_detector_obj = new MinesweeperGroupFailureDetector((long) 0);
-
-    Thread failure_detector = new Thread(failure_detector_obj);
-    failure_detector.run();
-
+    
     // building the game board text file
-    InitBoardFile.main(new String[1]);
     Main.gameBoard = Board.fromFile();
-
 
     //STARTING COMMIT LISTENER
     Thread c_listener = new CommitListener(3005);
-    c_listener.run();
+    c_listener.start();
 
     staticFiles.location("/public");
     staticFiles.expireTime(600L);
