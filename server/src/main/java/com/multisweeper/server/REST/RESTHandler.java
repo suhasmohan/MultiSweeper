@@ -11,7 +11,7 @@ import spark.Response;
 
 public class RESTHandler {
   private static final Logger log = LoggerFactory.getLogger(RESTHandler.class);
-  private static Board board = Board.fromFile();
+  public static Board board = Board.fromFile();
   private static ServerClass serverClass = new ServerClass();
 
   public static Object handleClick(Request req, Response res) {
@@ -28,8 +28,8 @@ public class RESTHandler {
     } else if (clickData.getType().equals("open")) {
         serverClass.playerMove("OPEN", clickData.getRow(), clickData.getCol());
     } else if (clickData.getType().equals("flag")) {
-        //RESTHandler.board.tileFlag(clickData.getRow(), clickData.getCol());
-        serverClass.playerMove("FLAG", clickData.getRow(), clickData.getCol());
+        RESTHandler.board.tileFlag(clickData.getRow(), clickData.getCol());
+        //serverClass.playerMove("FLAG", clickData.getRow(), clickData.getCol());
     }
 
     return "{status: \"success\"}";

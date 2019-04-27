@@ -19,7 +19,7 @@ import static spark.debug.DebugScreen.enableDebugScreen;
 
 public class Main {
 
-  public static Board gameBoard;
+  //public static Board gameBoard;
   private static Logger log = LoggerFactory.getLogger(Main.class);
   // initializing the gameBoard
 
@@ -40,7 +40,7 @@ public class Main {
     port(port);
     
     // building the game board text file
-    Main.gameBoard = Board.fromFile();
+    //Main.gameBoard = Board.fromFile();
 
     //STARTING COMMIT LISTENER
     Thread c_listener = new CommitListener(3005);

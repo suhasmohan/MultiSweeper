@@ -1,5 +1,7 @@
 package com.multisweeper.server.logic;
 import com.multisweeper.server.Main;
+import com.multisweeper.server.REST.RESTHandler;
+import com.multisweeper.server.utils.Constants;
 import com.multisweeper.server.utils.Logger;
 
 import java.io.BufferedReader;
@@ -51,12 +53,14 @@ public class CommitListener extends Thread {
 
 				//String req = reader.readLine();
 				String received_message = dis.readUTF();
-
-				String received_messages[] = received_message.split("|");
+				Logger.log("received message = "+received_message);
+				String received_messages[] = received_message.split(Constants.DELIMITTER);
+				Logger.log("received_messages[0] = "+received_messages[0]);
 
 				//Phase 1 for put
 
 				if(received_messages[0].equals("FLAG")){
+					Logger.log("Voting commit");
 					response = "commit";
 				}
 
@@ -66,12 +70,15 @@ public class CommitListener extends Thread {
 
 
 					if (primary_tile_key==this.ongoing_primary_key){
+						Logger.log("Voting abort");
 						response = "abort";
 					}
 					else if(secondary_tile_key==this.ongoing_secondary_key){
+						Logger.log("Voting abort");
 						response = "abort";
 					}
 					else{
+						Logger.log("Voting commit");
 						response = "commit";
 
 						//making the proposed key as the ongoing_key untill it is committed
@@ -82,6 +89,7 @@ public class CommitListener extends Thread {
 
 				else if(received_messages[0].equals("ABORT")){
 
+					Logger.log("Decision : ABORT");
 					this.ongoing_primary_key = -1000;
 					this.ongoing_secondary_key = -1000;
 
@@ -91,8 +99,9 @@ public class CommitListener extends Thread {
 					// implement the put operation for a given key/tile
 					int row= Integer.parseInt(received_messages[1]);
 					int col = Integer.parseInt(received_messages[2]);
-					Main.gameBoard.tileOpen(row,col);
-
+					Logger.log("Decision : COMMIT");
+					RESTHandler.board.tileOpen(row,col);
+					//Main.gameBoard.tileOpen(row,col);
 				}
 
 				dos.writeUTF(response);
