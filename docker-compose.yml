@@ -4,6 +4,8 @@ services:
         image: multisweeper/server
         ports:
             - "8080:8080"
+        networks:
+            - broadcast-net
         deploy:
             replicas: 3
             update_config:
@@ -11,3 +13,5 @@ services:
                 delay: 10s
             restart_policy:
                condition: none 
+networks:
+    broadcast-net:

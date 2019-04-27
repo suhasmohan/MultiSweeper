@@ -12,8 +12,8 @@ import java.net.*;
 class ServerClass{	
 	int self_port;
 	String self_ip;
-	ArrayList<String> ips= new ArrayList<String>(List.of("localhost","localhost","localhost"));
-	ArrayList<Integer> ports= new ArrayList<Integer>(List.of(3000,3001,3002));
+	ArrayList<String> ips= new ArrayList<String>();
+	ArrayList<Integer> ports= new ArrayList<Integer>();
 
 	ServerClass(int port){
 		this.self_port=port;
