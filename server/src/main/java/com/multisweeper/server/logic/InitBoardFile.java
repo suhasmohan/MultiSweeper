@@ -6,7 +6,7 @@ import java.util.Random;
 public class InitBoardFile {
   public static void main(String[] args) {
     Random rand = new Random();
-    int nRow = Math.min((int) (Math.abs(rand.nextGaussian() * 30) + 10), 70);
+    int nRow = Math.min((int) (Math.abs(rand.nextGaussian() * 5) + 10), 30);
     Board board = new Board(nRow);
     try {
 
