@@ -29,7 +29,7 @@ public interface MSServerFailureDetection extends Runnable {
 	   * getAliveMemberAddrs(): returns alive group members' ports.
 	   * @return a array of port numbers of alive group members
 	   */
-	public ArrayList<String> getAliveMemberAddrs();
+	//public  ArrayList<String> getAliveMemberAddrs();
 
 	/**
 	   * getDeadMemberAddrs(): returns dead group members' ports.
