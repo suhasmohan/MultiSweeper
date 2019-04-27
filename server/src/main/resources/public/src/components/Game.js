@@ -26,7 +26,7 @@ class Game extends Component {
         .then(res => res.json())
         .catch(err => console.error(err))
         .then(res => {
-          console.log(res);
+          // console.log(res);
           this.setState({
             status: res.status,
             nRows: res.nRows,

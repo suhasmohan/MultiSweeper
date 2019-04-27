@@ -232,7 +232,7 @@ public class Board implements Serializable {
     }
   }
 
-  public int getKeys(int r, int c) {
+  int getKeys(int r, int c) {
     if (validIndex(r, c)) {
       return cells[r][c].getKey();
     } else {
@@ -240,7 +240,7 @@ public class Board implements Serializable {
     }
   }
 
-  public int getSingleKeys(int r, int c) {
+  int getSingleKeys(int r, int c) {
     if (validIndex(r, c)) {
       return r * nCols + c;
     } else {
@@ -268,14 +268,12 @@ public class Board implements Serializable {
   public void tileOpen(int r, int c) {
 
     if (validIndex(r, c)) {
-      System.out.println(toStringBoard());
       if (status == Status.PLAY) {
         Tile current_t = cells[r][c].getTile();
         if (current_t == Tile.CLOSED) {
           cells[r][c].setTile(Tile.OPEN);
           nOpen++;
           if (cells[r][c].isMine()) {
-            System.out.println(toStringBoard());
             status = Status.LOSE;
           } else {
             if (cells[r][c].isEmpty()) {
