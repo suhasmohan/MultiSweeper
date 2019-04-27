@@ -17,19 +17,6 @@ import java.util.ArrayList;
 */
 
 public interface MSServerFailureDetection extends Runnable {
-	
-	/**
-	   * getGroupAddrsList method gets the list of group 
-	   * members' IP addresses without this server's IP address
-	   * @return 
-	   */
-	//public ArrayList<String> getGroupAddrsList();
-
-	/**
-	   * getAliveMemberAddrs(): returns alive group members' ports.
-	   * @return a array of port numbers of alive group members
-	   */
-	//public  ArrayList<String> getAliveMemberAddrs();
 
 	/**
 	   * getDeadMemberAddrs(): returns dead group members' ports.
