@@ -1,12 +1,18 @@
 package com.multisweeper.server;
 
 import com.multisweeper.server.REST.RESTHandler;
+import com.multisweeper.server.failure.MinesweeperGroupFailureDetector;
+import com.multisweeper.server.failure.MinesweeperGroupMulticast;
 import com.multisweeper.server.logic.Board;
+import com.multisweeper.server.logic.CommitListener;
 import com.multisweeper.server.logic.InitBoardFile;
 import com.multisweeper.server.utils.Constants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import spark.Request;
+
+import java.io.IOException;
+import java.util.ArrayList;
 
 import static spark.Spark.*;
 import static spark.debug.DebugScreen.enableDebugScreen;
@@ -32,6 +38,26 @@ public class Main {
     // building the game board text file
     InitBoardFile.main(new String[1]);
     Main.gameBoard = Board.fromFile();
+
+    //STARTING FAILURE DETECTOR
+
+    ArrayList<String> temp = new ArrayList<>();
+
+    MinesweeperGroupFailureDetector failure_detector_obj = null;
+    try {
+      failure_detector_obj = new MinesweeperGroupFailureDetector("change this",0,temp);
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+    Thread failure_detector = new Thread(failure_detector_obj);
+    failure_detector.run();
+
+
+
+
+    //STARTING COMMIT LISTENER
+    Thread c_listener = new CommitListener(3005);
+    c_listener.run();
 
     staticFiles.location("/public");
     staticFiles.expireTime(600L);
