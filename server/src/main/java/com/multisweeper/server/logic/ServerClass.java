@@ -9,14 +9,15 @@ import java.net.*;
 
 
 //class ServerClass implements ServerInterface{
-class ServerClass{	
-	int self_port;
+public class ServerClass{
+
+	//int self_port;
 	ArrayList<String> ips = new ArrayList<>();
 	ArrayList<Integer> ports= new ArrayList<Integer>();
 
-	ServerClass(int port){
-		this.self_port=port;
-	}
+//	ServerClass(int port){
+//		//this.self_port=port;
+//	}
 
 
 	private void updateIpAddresses(){
@@ -34,7 +35,7 @@ class ServerClass{
 
 		try {
 			//The second and the third part are the primary and the secondary key
-			if (type.equals("CLICK")) {
+			if (type.equals("OPEN")) {
 
 				mess = "PUT"
 						+ "|"
