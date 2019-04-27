@@ -1,6 +1,7 @@
 package com.multisweeper.server.logic;
 
 import com.multisweeper.server.Main;
+import com.multisweeper.server.failure.MinesweeperGroupFailureDetector;
 
 import java.util.*;
 import java.io.*;
@@ -18,18 +19,9 @@ class ServerClass{
 		this.self_port=port;
 	}
 
-//	public static void main(String args[]){
-//		//reading from file to initiate a board
-//
-//		// Starting Group communication
-//
-//		//Starting 2Phase Commit
-//
-//		//Starting HTTP Server
-//
-//	}
 
-	public void updateIpAddresses(){
+	private void updateIpAddresses(){
+			MinesweeperGroupFailureDetector.getAliveMemberAddrs();
 
 	}
 
@@ -87,6 +79,9 @@ class ServerClass{
 
 
 	private void multiCast(String message) throws InterruptedException {
+
+		updateIpAddresses();
+
 		List<Thread> threadList = new ArrayList<>();
 		for (String ip : this.ips) {
 			Thread t = new GroupMessageHandler(ip, message);

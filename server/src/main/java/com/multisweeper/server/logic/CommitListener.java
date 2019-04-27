@@ -28,7 +28,7 @@ public class CommitListener extends Thread {
 	public void run() {
 		ServerSocket socket;
 		Socket clientSocket;
-		BufferedReader reader;
+		//BufferedReader reader;
 
 		try {
 			// Create a server socket and bind to port. Set connection backlog to 1

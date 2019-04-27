@@ -30,10 +30,10 @@ public class GroupMessageHandler extends Thread {
 		DataOutputStream dos;
 		DataInputStream dis;
 
-		String hostname = "localhost";
+		//String hostname = "localhost";
 
 		try {
-			socket = new Socket(hostname, port);
+			socket = new Socket(my_ip, port);
 			//Logger.log(String.format("Connected to Server %s:%d", hostname, port));
 			// Get the output stream of the socket. This is used to send data to the server
 			// writer = new PrintWriter(socket.getOutputStream(), true);
