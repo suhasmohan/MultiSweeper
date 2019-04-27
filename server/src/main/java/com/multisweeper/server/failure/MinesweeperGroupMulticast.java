@@ -1,7 +1,8 @@
 package com.multisweeper.server.failure;
 import java.io.IOException;
 import java.net.DatagramPacket;
-import java.net.DatagramSocket;
+import java.net.InetAddress;
+import java.net.MulticastSocket;
 import java.util.LinkedList;
 import java.util.Queue;
 
@@ -23,7 +24,7 @@ public class MinesweeperGroupMulticast implements Runnable {
 	// constants
 	private static final int PACKET_BUFF_SIZE = 100;
 	// UDP variables
-	private static DatagramSocket udpSocket;
+	private static MulticastSocket udpSocket;
 	private static String myIPAddr;
 	// message buffer
 	private static Queue<DatagramPacket> receivedPacketQueue;
@@ -58,7 +59,10 @@ public class MinesweeperGroupMulticast implements Runnable {
 	   * @return nothing
 	   */
 	public static void setServerSocket(int portNum) throws IOException {
-		MinesweeperGroupMulticast.udpSocket = new DatagramSocket(portNum);
+		MinesweeperGroupMulticast.udpSocket = new MulticastSocket(portNum);
+		for (String ipAddr : MinesweeperGroupFailureDetector.getGroupAddrsList()) {
+			udpSocket.joinGroup(InetAddress.getByName(ipAddr));
+		}
 		System.out.printf("Server is running at port: %d\n",portNum);
 	}
 	
@@ -87,7 +91,9 @@ public class MinesweeperGroupMulticast implements Runnable {
 	   * @return nothing
 	   */
 	public static void addToSendQueue(DatagramPacket dgp) {
-		MinesweeperGroupMulticast.sendPacketQueue.add(dgp);
+		synchronized (MinesweeperGroupMulticast.sendPacketQueue) {
+			MinesweeperGroupMulticast.sendPacketQueue.add(dgp);
+		}
 	}
 	
 	/**
@@ -130,11 +136,14 @@ public class MinesweeperGroupMulticast implements Runnable {
 		while(true) {
 			try {
 				// if there is a message in the send message queue
-				if (!MinesweeperGroupMulticast.sendPacketQueue.isEmpty()) {
-					DatagramPacket sendPacket = 
-							MinesweeperGroupMulticast.sendPacketQueue.remove();
-					MinesweeperGroupMulticast.udpSocket.send(sendPacket);
+				synchronized(MinesweeperGroupMulticast.sendPacketQueue) {
+					if (!MinesweeperGroupMulticast.sendPacketQueue.isEmpty()) {
+						DatagramPacket sendPacket = 
+								MinesweeperGroupMulticast.sendPacketQueue.remove();
+						MinesweeperGroupMulticast.udpSocket.send(sendPacket);
+					}
 				}
+				
 			} catch(Exception err) {
 				this.handleExceptions(err);
 			}
@@ -154,7 +163,9 @@ public class MinesweeperGroupMulticast implements Runnable {
 								PACKET_BUFF_SIZE);
 				// blocking receive statement
 				MinesweeperGroupMulticast.udpSocket.receive(receivePacket);
-				MinesweeperGroupMulticast.receivedPacketQueue.add(receivePacket);
+				synchronized(MinesweeperGroupMulticast.receivedPacketQueue) {
+					MinesweeperGroupMulticast.receivedPacketQueue.add(receivePacket);
+				}
 			} catch(Exception err) {
 				this.handleExceptions(err);
 			}
@@ -171,27 +182,31 @@ public class MinesweeperGroupMulticast implements Runnable {
 		while(true) {
 			try {
 				// when there is a message to be processed
-				if (!MinesweeperGroupMulticast.receivedPacketQueue.isEmpty()) {
-					DatagramPacket receivedPacket = 
-							MinesweeperGroupMulticast.receivedPacketQueue.remove();
-					// parse the message into String array (always length of 3)
-					// [<IP-address>,<Container-ID>,<sequence-number>]
-					String[] parsedMessage = this.parseMessageToArray(receivedPacket);
-					// if this is a echoed back message from a group member
-					if (parsedMessage[0].equals(MinesweeperGroupMulticast.myIPAddr)) {
-						// update the entry with the sender's IP address as key in the
-						// last seen sequence tracking table
-						MinesweeperGroupFailureDetector.updatelastReceivedValue(
-								receivedPacket.getAddress().toString(),
-									Integer.parseInt(parsedMessage[2]));
-					} else {
-						// create echo back message and put it in the send message queue
-						DatagramPacket echoBackPacket = 
-								new DatagramPacket(receivedPacket.getData(),
-										receivedPacket.getData().length,
-											receivedPacket.getAddress(),
-												receivedPacket.getPort());
-						MinesweeperGroupMulticast.sendPacketQueue.add(echoBackPacket);
+				synchronized(MinesweeperGroupMulticast.receivedPacketQueue) {
+					if (!MinesweeperGroupMulticast.receivedPacketQueue.isEmpty()) {
+						DatagramPacket receivedPacket = 
+								MinesweeperGroupMulticast.receivedPacketQueue.remove();
+						// parse the message into String array (always length of 3)
+						// [<IP-address>,<Container-ID>,<sequence-number>]
+						String[] parsedMessage = this.parseMessageToArray(receivedPacket);
+						// if this is a echoed back message from a group member
+						if (parsedMessage[0].equals(MinesweeperGroupMulticast.myIPAddr)) {
+							// update the entry with the sender's IP address as key in the
+							// last seen sequence tracking table
+							MinesweeperGroupFailureDetector.updatelastReceivedValue(
+									receivedPacket.getAddress().toString(),
+										Integer.parseInt(parsedMessage[2]));
+						} else {
+							// create echo back message and put it in the send message queue
+							DatagramPacket echoBackPacket = 
+									new DatagramPacket(receivedPacket.getData(),
+											receivedPacket.getData().length,
+												receivedPacket.getAddress(),
+													receivedPacket.getPort());
+							synchronized(MinesweeperGroupMulticast.sendPacketQueue) {
+								MinesweeperGroupMulticast.sendPacketQueue.add(echoBackPacket);
+							}
+						}
 					}
 				}
 			} catch(Exception err) {
