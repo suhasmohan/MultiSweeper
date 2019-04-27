@@ -42,7 +42,7 @@ public class Board implements Serializable {
    * calculate clues<br>
    * (*)set game status to play<br>
    */
-  Board() {
+  public Board() {
     this(10, 10, 0.15);
   }
   /**
@@ -69,7 +69,7 @@ public class Board implements Serializable {
     initGame();
   }
 
-  static Board fromFile() {
+  public static Board fromFile() {
     try {
       FileInputStream fi = new FileInputStream(new File("board.txt"));
       ObjectInputStream oi = new ObjectInputStream(fi);
