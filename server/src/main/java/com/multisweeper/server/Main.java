@@ -5,13 +5,23 @@ import com.multisweeper.server.utils.Constants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import spark.Request;
+import com.multisweeper.server.logic.*;
 
 import static spark.Spark.*;
 import static spark.debug.DebugScreen.enableDebugScreen;
 
 public class Main {
 
+<<<<<<< HEAD
   private static final Logger log = LoggerFactory.getLogger(Main.class);
+=======
+	static Logger log = LoggerFactory.getLogger(Main.class);
+	public static Board gameBoard;
+	//initializing the gameBoard
+
+
+
+>>>>>>> 90626c20001a35e4d846c983ce2b94b334743090
 
   private static String requestInfoToString(Request request) {
     StringBuilder sb = new StringBuilder();
@@ -25,9 +35,19 @@ public class Main {
     int port = Constants.PORT;
     port(port);
 
+<<<<<<< HEAD
     staticFiles.location("/public");
     staticFiles.expireTime(600L);
     enableDebugScreen();
+=======
+		//building the game board text file
+		InitBoardFile.main(new String[1]);
+		gameBoard = Board.fromFile();
+
+		staticFiles.location("/public");
+		staticFiles.expireTime(600L);
+		enableDebugScreen();
+>>>>>>> 90626c20001a35e4d846c983ce2b94b334743090
 
     before(
         (request, response) -> {
