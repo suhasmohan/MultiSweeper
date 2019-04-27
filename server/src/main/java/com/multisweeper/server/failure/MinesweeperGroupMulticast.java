@@ -168,7 +168,7 @@ public class MinesweeperGroupMulticast implements Runnable {
 						DatagramPacket sendPacket =
 								MinesweeperGroupMulticast.sendPacketQueue.remove();
 						//MinesweeperGroupMulticast.udpSocket.send(sendPacket);
-						Logger.log("Sending broadcast message!");
+						//Logger.log("Sending broadcast message!");
 						broadcast(sendPacket);
 
 					}
@@ -194,7 +194,7 @@ public class MinesweeperGroupMulticast implements Runnable {
 								PACKET_BUFF_SIZE);
 				// blocking receive statement
 				MinesweeperGroupMulticast.udpSocket.receive(receivePacket);
-				Logger.log("Received heartbeat from " + receivePacket.getAddress().getHostAddress());
+			//	Logger.log("Received heartbeat from " + receivePacket.getAddress().getHostAddress());
 				synchronized (MinesweeperGroupMulticast.receivedPacketQueue) {
 					MinesweeperGroupMulticast.receivedPacketQueue.add(receivePacket);
 				}

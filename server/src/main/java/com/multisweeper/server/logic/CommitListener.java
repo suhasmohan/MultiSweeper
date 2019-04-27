@@ -1,5 +1,6 @@
 package com.multisweeper.server.logic;
 import com.multisweeper.server.Main;
+import com.multisweeper.server.utils.Logger;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -38,7 +39,7 @@ public class CommitListener extends Thread {
 				// Wait and accept a connection
 				clientSocket = socket.accept();
 				String response="";
-				//Logger.log("Got commit connection!");
+				Logger.log("Got commit connection!");
 				// Get a communication stream associated with the socket
 				
 				// PrintWriter writer = new PrintWriter(clientSocket.getOutputStream(), true);
