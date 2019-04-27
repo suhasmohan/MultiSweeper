@@ -227,7 +227,7 @@ public class MinesweeperGroupMulticast implements Runnable {
 						// update the entry with the sender's IP address as key in the
 						// last seen sequence tracking table
 						MinesweeperGroupFailureDetector.updatelastReceivedValue(
-								receivedPacket.getAddress().toString(),
+								receivedPacket.getAddress().getHostAddress(),
 								ZonedDateTime.now().toInstant().toEpochMilli());
 
 					}
