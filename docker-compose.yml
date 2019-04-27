@@ -6,6 +6,8 @@ services:
             - "8080:8080"
         networks:
             - broadcast-net
+        volumes:
+            - "./board.txt:/usr/local/board.txt"
         deploy:
             replicas: 3
             update_config:
