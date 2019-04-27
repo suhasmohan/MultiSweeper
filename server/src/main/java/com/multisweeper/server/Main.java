@@ -1,6 +1,8 @@
 package com.multisweeper.server;
 
 import com.multisweeper.server.REST.RESTHandler;
+import com.multisweeper.server.failure.MSServerFailureDetection;
+import com.multisweeper.server.failure.MinesweeperGroupFailureDetector;
 import com.multisweeper.server.logic.Board;
 import com.multisweeper.server.logic.InitBoardFile;
 import com.multisweeper.server.utils.Constants;
@@ -51,5 +53,13 @@ public class Main {
     get("/api/getBoard", (req, res) -> RESTHandler.getBoard(req, res));
 
     System.out.println("Server started on port " + port);
+
+
+    MSServerFailureDetection failureDetection = new MinesweeperGroupFailureDetector(0L);
+
+    Thread t = new Thread(failureDetection);
+
+    t.start();
+
   }
 }

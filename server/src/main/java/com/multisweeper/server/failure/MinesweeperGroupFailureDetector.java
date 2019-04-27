@@ -1,11 +1,15 @@
 package com.multisweeper.server.failure;
+import com.multisweeper.server.utils.Logger;
+
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Hashtable;
+import java.util.Map;
 
 /**
 * MinesweeperGroupFailureDetector
@@ -25,19 +29,17 @@ public class MinesweeperGroupFailureDetector implements MSServerFailureDetection
 	// constants
 	private static final String MESSAGE_TEMPLATE = "%s|%s|%d";
 	private static final int GROUP_COMM_PORT = 3333;
-	private static final int TOUCH_BASE_MULTICAST_INTERVAL = 500; // in milliseconds
+	private static final int TOUCH_BASE_MULTICAST_INTERVAL = 5000; // in milliseconds
 	private static final int MISSED_MESSAGE_TOLERANCE_COUNT = 2;
 	// group lists
-	private static ArrayList<String> groupAddrs;
 	private static ArrayList<String> aliveMemberAddrs;
 	private static ArrayList<String> deadMemberAddrs;
 	// other static objects
 	// lastReceivedSeqTable: is used for tracking the sequence number
 	// for detecting group member failure
-	private static Hashtable<String,Integer> lastReceivedSeqTable;
+	private static Hashtable<String, Long> lastReceivedSeqTable = new Hashtable<>();
 	// This server information
-	private static String myIPAddr;
-	private static int msgSeq;
+	private static Long msgSeq;
 	// worker threads
 	private ThreadGroup multicastOps;
 	
@@ -48,14 +50,13 @@ public class MinesweeperGroupFailureDetector implements MSServerFailureDetection
 	   * @param groupAddrs list of IP addresses of group members
 	   * @exception IOException On input error.
 	   */
-	public MinesweeperGroupFailureDetector(String myIPAddr,int msgSeq, 
-			ArrayList<String> groupAddrs) throws IOException {
-		this.setStaticGroupLists(groupAddrs);
-		this.setlastReceivedSeqTable();
-		MinesweeperGroupMulticast.setIPAddr(myIPAddr);
+	public MinesweeperGroupFailureDetector( Long msgSeq
+										  ) {
+		this.setStaticGroupLists();
+//		this.setlastReceivedSeqTable();
 		MinesweeperGroupMulticast.setMessageQueues();
 		MinesweeperGroupMulticast.setServerSocket(GROUP_COMM_PORT);
-		MinesweeperGroupFailureDetector.myIPAddr = myIPAddr;
+
 		MinesweeperGroupFailureDetector.msgSeq = msgSeq;
 		this.multicastOps = new ThreadGroup("Multicast Operations");
 	}
@@ -67,10 +68,7 @@ public class MinesweeperGroupFailureDetector implements MSServerFailureDetection
 	   * @param groupAddrs list of IP addresses of group members
 	   * @return returns nothing.
 	   */
-	private void setStaticGroupLists(ArrayList<String> groupAddrs) throws IOException {
-		if (MinesweeperGroupFailureDetector.groupAddrs == null) {
-			MinesweeperGroupFailureDetector.groupAddrs = groupAddrs;
-		}
+	private void setStaticGroupLists() {
 		if (MinesweeperGroupFailureDetector.aliveMemberAddrs == null) {
 			MinesweeperGroupFailureDetector.aliveMemberAddrs = new ArrayList<String>();
 		}
@@ -79,21 +77,21 @@ public class MinesweeperGroupFailureDetector implements MSServerFailureDetection
 		}
 	}
 	
-	/**
-	   * setlastReceivedSeqTable() method creates and puts entries into  
-	   * lastReceivedSeqTable.
-	   * @return nothing.
-	   */
-	private void setlastReceivedSeqTable() {
-		MinesweeperGroupFailureDetector.lastReceivedSeqTable = new Hashtable<String,Integer>();
-		synchronized(MinesweeperGroupFailureDetector.lastReceivedSeqTable) {
-			for (String ipAddr : MinesweeperGroupFailureDetector.groupAddrs) {
-				MinesweeperGroupFailureDetector.lastReceivedSeqTable
-					.put(ipAddr,MinesweeperGroupFailureDetector.msgSeq);
-			}
-		}
-	}
-	
+//	/**
+//	   * setlastReceivedSeqTable() method creates and puts entries into
+//	   * lastReceivedSeqTable.
+//	   * @return nothing.
+//	   */
+//	private void setlastReceivedSeqTable() {
+//		MinesweeperGroupFailureDetector.lastReceivedSeqTable = new Hashtable<String, Long>();
+//		synchronized(MinesweeperGroupFailureDetector.lastReceivedSeqTable) {
+//			for (String ipAddr : MinesweeperGroupFailureDetector.groupAddrs) {
+//				MinesweeperGroupFailureDetector.lastReceivedSeqTable
+//					.put(ipAddr,MinesweeperGroupFailureDetector.msgSeq);
+//			}
+//		}
+//	}
+//
 	/**
 	   * addMessagesToQueue method periodic group multicast messages to send
 	   * message queue.
@@ -103,18 +101,18 @@ public class MinesweeperGroupFailureDetector implements MSServerFailureDetection
 			throws UnsupportedEncodingException, UnknownHostException {
 		// create message string
 		String messageToGroup = String.format(MESSAGE_TEMPLATE,
-				MinesweeperGroupFailureDetector.myIPAddr,
+				"LIGMA HEART",
 					System.getenv("HOSTNAME"),
 						MinesweeperGroupFailureDetector.msgSeq);
 		// send to each group members
-		for (String ipAddr : MinesweeperGroupFailureDetector.groupAddrs) {
+		//for (String ipAddr : MinesweeperGroupFailureDetector.groupAddrs) {
 			DatagramPacket touchBaseMessage = 
 					new DatagramPacket(messageToGroup.getBytes("UTF-8"),
 							messageToGroup.getBytes("UTF-8").length,
-								InetAddress.getByName(ipAddr),
+								InetAddress.getByName("172.19.255.255"),
 									GROUP_COMM_PORT);
 			MinesweeperGroupMulticast.addToSendQueue(touchBaseMessage);
-		}
+		//}
 		MinesweeperGroupFailureDetector.msgSeq++;
 	}
 	
@@ -130,7 +128,7 @@ public class MinesweeperGroupFailureDetector implements MSServerFailureDetection
 		// look through lastReceivedSeqTable and re-occupy lists
 		synchronized(MinesweeperGroupFailureDetector.lastReceivedSeqTable) {
 			for (String ipAddr : MinesweeperGroupFailureDetector.lastReceivedSeqTable.keySet()) {
-				int receivedSeq = MinesweeperGroupFailureDetector.lastReceivedSeqTable.get(ipAddr);
+				Long receivedSeq = MinesweeperGroupFailureDetector.lastReceivedSeqTable.get(ipAddr);
 				// when sequence number in the message within tolerance bound
 				if ((MinesweeperGroupFailureDetector.msgSeq - (receivedSeq + 1)) 
 						< MISSED_MESSAGE_TOLERANCE_COUNT) {
@@ -169,7 +167,8 @@ public class MinesweeperGroupFailureDetector implements MSServerFailureDetection
 				// wait 500ms for the group members to reply
 				Thread.sleep(TOUCH_BASE_MULTICAST_INTERVAL);
 				// update alive/dead lists
-				this.updateGroupStatusLists();
+				//this.updateGroupStatusLists();
+				Logger.log("ALive servers = " + getAliveMemberAddrs().toString());
 			} catch (Exception err) {
 				this.handleExceptions(err);
 			}
@@ -200,7 +199,7 @@ public class MinesweeperGroupFailureDetector implements MSServerFailureDetection
 	   * sequence number for each group member.
 	   * @return nothing
 	   */
-	public static void updatelastReceivedValue(String ipAddr,int seq) {
+	public static void updatelastReceivedValue(String ipAddr, Long seq) {
 		synchronized (MinesweeperGroupFailureDetector.lastReceivedSeqTable) {
 			MinesweeperGroupFailureDetector.lastReceivedSeqTable.put(ipAddr,seq);
 		}
@@ -211,9 +210,9 @@ public class MinesweeperGroupFailureDetector implements MSServerFailureDetection
 	   * members' IP addresses without this server's IP address
 	   * @return 
 	   */
-	public static ArrayList<String> getGroupAddrsList() {
-		return MinesweeperGroupFailureDetector.groupAddrs;
-	}
+//	public static ArrayList<String> getGroupAddrsList() {
+//		return MinesweeperGroupFailureDetector.groupAddrs;
+//	}
 
 	// MinesweeperServerFailureDetection interface methods
 
@@ -224,7 +223,14 @@ public class MinesweeperGroupFailureDetector implements MSServerFailureDetection
 	   * @return a array of port numbers of alive group members
 	   */
 	public ArrayList<String> getAliveMemberAddrs() {
-		return MinesweeperGroupFailureDetector.aliveMemberAddrs;
+		ArrayList<String> aliveMembers = new ArrayList<>();
+		long currentTimeStamp = ZonedDateTime.now().toInstant().toEpochMilli();
+		for(Map.Entry<String, Long> entry : lastReceivedSeqTable.entrySet()) {
+			if(entry.getValue() > currentTimeStamp - (TOUCH_BASE_MULTICAST_INTERVAL * MISSED_MESSAGE_TOLERANCE_COUNT)) {
+				aliveMembers.add(entry.getKey());
+			}
+		}
+		return aliveMembers;
 	}
 
 	/**
