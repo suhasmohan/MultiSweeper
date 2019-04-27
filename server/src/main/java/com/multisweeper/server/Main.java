@@ -1,7 +1,7 @@
 package com.multisweeper.server;
 
 import com.multisweeper.server.REST.RESTHandler;
-import com.multisweeper.server.Replication.ReplicationHandler;
+import com.multisweeper.server.replication.ReplicationHandler;
 import com.multisweeper.server.failure.MSServerFailureDetection;
 import com.multisweeper.server.failure.MinesweeperGroupFailureDetector;
 import com.multisweeper.server.logic.CommitListener;

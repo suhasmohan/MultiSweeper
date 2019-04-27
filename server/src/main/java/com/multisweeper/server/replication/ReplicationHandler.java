@@ -1,9 +1,10 @@
-package com.multisweeper.server.Replication;
+package com.multisweeper.server.replication;
 
 import com.google.gson.Gson;
 import com.multisweeper.server.REST.RESTHandler;
 import com.multisweeper.server.failure.MinesweeperGroupFailureDetector;
 import com.multisweeper.server.logic.Board;
+import com.multisweeper.server.utils.Logger;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -44,8 +45,7 @@ public class ReplicationHandler {
 					in.close();
 					con.disconnect();
 
-					System.out.println("Got response " + content);
-
+					Logger.log("Got replica!");
 					Board replicatedBoard = new Gson().fromJson(content.toString(), Board.class);
 
 					RESTHandler.setBoard(replicatedBoard);
